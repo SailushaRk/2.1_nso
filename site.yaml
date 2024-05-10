@@ -49,18 +49,18 @@
           apt:
             update_cache: yes
         
-    - name: Install HAproxy
-      apt:
-        name: haproxy
-        state: latest
+        - name: Install HAproxy
+          apt:
+            name: haproxy
+            state: latest
         
-    - name: Configure HAproxy
-      template:
-        src: haproxy.cfg.j2
-        dest: /etc/haproxy/haproxy.cfg
-      become: yes
-      
-    - name: Restart haproxy
-      service:
-        name: haproxy
-        state: restarted
+        - name: Configure HAproxy
+          template:
+            src: haproxy.cfg.j2
+            dest: /etc/haproxy/haproxy.cfg
+          become: yes
+       
+        - name: Restart haproxy
+          service:
+            name: haproxy
+            state: restarted
