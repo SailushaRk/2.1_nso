@@ -8,9 +8,9 @@
   tasks:
     - name: apt update
       apt:
-        update_cache: true
+        update_cache: yes
         
-    - name: Install python3, pip3 venv
+    - name: Install python3, pip3, venv
       become: true
       apt:
         name:
@@ -27,6 +27,7 @@
         state: latest
         
     - name: Installing Gunicorn
+      become: true
       apt:
         name: gunicorn
         
@@ -40,27 +41,26 @@
     - name: Running Flask application
       shell: gunicorn -w 2 -D -b 0.0.0.0:7000 application2:app
 
-    - name: Configure HAproxy load balancer
-      hosts: HAproxy
+- hosts: HAproxy
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: apt update
+      apt:
+        update_cache: yes
+        
+    - name: Install HAproxy
+      apt:
+        name: haproxy
+        state: latest
+        
+    - name: Configure HAproxy
+      template:
+        src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
       become: yes
-      become_method: sudo
-      tasks:
-        - name: apt update
-          apt:
-            update_cache: yes
-        
-        - name: Install HAproxy
-          apt:
-            name: haproxy
-            state: latest
-        
-        - name: Configure HAproxy
-          template:
-            src: haproxy.cfg.j2
-            dest: /etc/haproxy/haproxy.cfg
-          become: yes
        
-        - name: Restart haproxy
-          service:
-            name: haproxy
-            state: restarted
+    - name: Restart haproxy
+      service:
+        name: haproxy
+        state: restarted
